@@ -1,0 +1,111 @@
+@page "/admin"
+@using PupaaS.Client.Models
+@using PupaaS.Client.Services
+@inject IPupusaService service
+
+<MudDataGrid @ref="_dataGrid" T="Pupusa" ServerData="ServerReload" ReadOnly="false" SortMode="SortMode.None" EditMode="DataGridEditMode.Form" StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges" Dense>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Pupusas</MudText>
+        <MudSpacer/>
+        <MudTextField T="string" ValueChanged="@((s) => OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+    </ToolBarContent>
+    
+    <Columns>
+        <PropertyColumn Property="pupusa => pupusa.Url" Title="Url" Editable="false">
+            <EditTemplate>
+                <MudImage Src="@context.Item.Url" Elevation="25" Width="400" Height="400" ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Center" Fluid Class="rounded-lg  mx-sm-4 mb-8"/>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="pupusa => pupusa.Dough" Title="Dough">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.Item.Dough" Label="Dough type" HelperText="Select the dough type from the list">
+                    @foreach (var dough in AppParameters.DoughTypes)
+                    {
+                        <MudSelectItem Value="@dough">@dough</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <TemplateColumn Title="Ingredients">
+            <CellTemplate>
+                @foreach (var ingredient in context.Item?.Ingredients ?? [])
+                {
+                    <MudChip T="string" Size="Size.Small">@ingredient</MudChip>
+                }
+            </CellTemplate>
+            <EditTemplate>
+                <MudSelect @bind-SelectedValues="context.Item.Ingredients" Label="Dough type" HelperText="Select the ingredients from the list" MultiSelection="true">
+                    @foreach (var ingredient in AppParameters.Ingredients)
+                    {
+                        <MudSelectItem Value="@ingredient">@ingredient</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </TemplateColumn>
+
+        <TemplateColumn>
+            <CellTemplate>
+                <MudStack Row Spacing="2">
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync"/>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" Class="mx-2" OnClick="@(_ => OnDelete(context.Item))"/>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    
+    <PagerContent>
+        <MudDataGridPager T="Pupusa"/>
+    </PagerContent>
+</MudDataGrid>
+
+@code
+{
+    private MudDataGrid<Pupusa>? _dataGrid;
+    private PupusaParameters _parameters = new();
+    
+
+    private async Task<GridData<Pupusa>> ServerReload(GridState<Pupusa> state)
+    {
+        _parameters.Page = state.Page + 1;
+        _parameters.PageSize = state.PageSize;
+        var data = await service.GetPupusasAsync(_parameters);
+        
+        return new GridData<Pupusa>
+        {
+            TotalItems = data?.TotalItems ?? 0,
+            Items = data?.Items ?? []
+        };
+    }
+
+    private Task OnSearch(string s)
+    {
+        _parameters.Search = s;
+        return _dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    }
+
+    private void OnDelete(Pupusa pupusa)
+    {
+        
+    }
+    
+    private void OnCreate()
+    {
+        
+    }
+    
+    // Editing hooks
+    private void StartedEditingItem(Pupusa pupusa)
+    {
+        
+    }
+    
+    private void CanceledEditingItem(Pupusa pupusa)
+    {
+        
+    }
+    
+    private Task CommittedItemChanges(Pupusa pupusa)
+    {
+        return Task.CompletedTask;
+    }
+}
