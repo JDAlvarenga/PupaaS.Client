@@ -1,0 +1,17 @@
+@using PupaaS.Client.Models
+
+<MudSelect @bind-Value:get="Dough" 
+           @bind-Value:set="DoughChanged" 
+           Label="Dough type" 
+           HelperText="Select the dough type from the list">
+    @foreach (var dough in AppParameters.DoughTypes)
+    {
+        <MudSelectItem Value="@dough">@dough</MudSelectItem>
+    }
+</MudSelect>
+
+@code
+{
+    [Parameter] public string? Dough { get; set; }
+    [Parameter] public EventCallback<string?> DoughChanged { get; set; }
+}

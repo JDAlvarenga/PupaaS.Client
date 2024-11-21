@@ -1,0 +1,18 @@
+@using PupaaS.Client.Models
+
+<MudSelect @bind-SelectedValues:get="Ingredients" 
+           @bind-SelectedValues:set="IngredientsChanged" 
+           Label="Ingredients" 
+           HelperText="Select the ingredients from the list" 
+           MultiSelection="true">
+    @foreach (var ingredient in AppParameters.Ingredients)
+    {
+        <MudSelectItem Value="@ingredient">@ingredient</MudSelectItem>
+    }
+</MudSelect>
+
+@code
+{
+    [Parameter] public IEnumerable<string>? Ingredients { get; set; }
+    [Parameter] public EventCallback<IEnumerable<string>?> IngredientsChanged { get; set; }
+}

@@ -1,0 +1,124 @@
+@using PupaaS.Client.Models
+@using PupaaS.Client.Services
+@inject ISnackbar Snackbar
+@inject IPupusaService PupusaService
+
+<MudDialog>
+    
+    <TitleContent>
+        <MudText Typo="Typo.body1"> New Pupusa</MudText>
+    </TitleContent>
+    <DialogContent>
+        
+        <MudForm @ref="_form" Model="_newPupusa">
+
+            
+            <MudStack>
+                @if (_imgPreview is null)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                                 Height="@($"{MaxPreviewHeight}px")"
+                                 Animation="Animation.False"/>
+                }
+                else
+                {
+                    <MudImage
+                        Src="@_imgPreview"
+                        Height="MaxPreviewHeight"
+
+                        ObjectFit="ObjectFit.Contain"/>
+                }
+                <MudFileUpload @ref="_mudFileUpload"
+                               T="IBrowserFile"
+                               Accept=".png, .jpg, .webp"
+                               FilesChanged="OnFileChanged"
+                               Required>
+                    <ActivatorContent>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   StartIcon="@Icons.Material.Outlined.CloudUpload">
+                            Select Image
+                        </MudButton>
+                    </ActivatorContent>
+                    <SelectedTemplate>
+                        <MudText Typo="Typo.caption">@context?.Name</MudText>
+                    </SelectedTemplate>
+                </MudFileUpload>
+
+                <DoughSelect @bind-Dough="_newPupusa.Dough"/>
+                <IngredientSelect @bind-Ingredients="_newPupusa.Ingredients"/>
+            </MudStack>
+
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Inherit"
+                   OnClick="Cancel"
+                   Class="ml-auto">
+            Cancel
+        </MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="@(async () => await Submit())">
+            Submit
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code
+{
+    [CascadingParameter] private IMudDialogInstance? DialogInstance { get; set; }
+    
+    
+    private MudForm? _form;
+    private MudFileUpload<IBrowserFile>? _mudFileUpload;
+    private NewPupusa _newPupusa = new();
+    private string? _imgPreview;
+
+    private const int MaxPreviewWidth = 400;
+    private const int MaxPreviewHeight = 225;
+
+    private async Task OnFileChanged(IBrowserFile? img)
+    {
+        if (img is null)
+        {
+            _imgPreview = null;
+            _newPupusa.File = img;
+            return;
+        }
+         var preview = await img.RequestImageFileAsync(img.ContentType, MaxPreviewWidth, MaxPreviewHeight);
+
+         byte[] previewBytes = new byte[preview.Size];
+         await using var previewStream = preview.OpenReadStream();
+         _ = await previewStream.ReadAsync(previewBytes, 0, (int)preview.Size);
+         var encodedImg = Convert.ToBase64String(previewBytes);
+         _imgPreview = $"data:{preview.ContentType};base64,{encodedImg}";
+         
+    }
+    
+    private Task ClearImageAsync() => _mudFileUpload?.ClearAsync() ?? Task.CompletedTask;
+    
+    private async Task Submit()
+    {
+        if (_form is null) return;
+        
+        await _form.Validate();
+
+        if (!_form.IsValid)
+            return;
+
+        var result = await PupusaService.AddPupusaAsync(_newPupusa);
+        if (result is null)
+        {
+            Snackbar.Add("Could not upload pupusa", Severity.Error);
+            return;
+        }
+        
+        Snackbar.Add("Added Pupusa", Severity.Success);
+        DialogInstance?.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel() => DialogInstance?.Cancel();
+
+}

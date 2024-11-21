@@ -5,15 +5,17 @@ namespace PupaaS.Client.Services.Mock;
 public class MockPupusaService: IPupusaService
 {
     private List<Pupusa> _pupusas = new();
+    private int _nextId = 1;
+    private string NextMockUrl => $"https://picsum.photos/500?random={_nextId++}";
     
 
     public MockPupusaService()
     {
-        for (int i = 0; i < 50; i++)
+        while(_nextId <= 50)
         {
             _pupusas.Add(new()
             {
-                Url = $"https://picsum.photos/500?random={i}",
+                Url = NextMockUrl,
                 Dough = AppParameters.DoughTypes[Random.Shared.Next(AppParameters.DoughTypes.Length)],
                 Ingredients = AppParameters.Ingredients.OrderBy(ing => Random.Shared.Next()).Take(Random.Shared.Next(1, 4)).ToArray()
             });
@@ -56,4 +58,19 @@ public class MockPupusaService: IPupusaService
                 Items = pagedItems,
             });
     }
+
+    public async Task<Pupusa?> AddPupusaAsync(NewPupusa newPupusa, CancellationToken cancellationToken = default)
+    {
+        Pupusa pupusa = new()
+        {
+            Url = NextMockUrl,
+            Dough = newPupusa.Dough,
+            Ingredients = newPupusa.Ingredients
+        };
+        await Task.Delay(TimeSpan.FromSeconds(Random.Shared.NextDouble() * 7), cancellationToken);
+        _pupusas.Add(pupusa);
+        
+        return pupusa.Clone() as Pupusa;
+    }
+    
 }

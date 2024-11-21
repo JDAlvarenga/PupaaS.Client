@@ -1,13 +1,19 @@
 @page "/admin"
 @using PupaaS.Client.Models
 @using PupaaS.Client.Services
-@inject IPupusaService service
+@using PupaaS.Client.Components
+@inject IPupusaService PupusaService
+@inject IDialogService DialogService
 
 <MudDataGrid @ref="_dataGrid" T="Pupusa" ServerData="ServerReload" ReadOnly="false" SortMode="SortMode.None" EditMode="DataGridEditMode.Form" StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges" Dense>
     <ToolBarContent>
         <MudText Typo="Typo.h6">Pupusas</MudText>
         <MudSpacer/>
         <MudTextField T="string" ValueChanged="@((s) => OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        <MudIconButton Icon="@Icons.Material.Outlined.AddCircle" 
+                       Size="Size.Large" 
+                       Color="Color.Primary"
+                       OnClick="DisplayAddForm"/>
     </ToolBarContent>
     
     <Columns>
@@ -68,7 +74,7 @@
     {
         _parameters.Page = state.Page + 1;
         _parameters.PageSize = state.PageSize;
-        var data = await service.GetPupusasAsync(_parameters);
+        var data = await PupusaService.GetPupusasAsync(_parameters);
         
         return new GridData<Pupusa>
         {
@@ -83,12 +89,7 @@
         return _dataGrid?.ReloadServerData() ?? Task.CompletedTask;
     }
 
-    private void OnDelete(Pupusa pupusa)
-    {
-        
-    }
-    
-    private void OnCreate()
+    private void OnDelete(Pupusa? pupusa)
     {
         
     }
@@ -107,5 +108,15 @@
     private Task CommittedItemChanges(Pupusa pupusa)
     {
         return Task.CompletedTask;
+    }
+
+    private Task DisplayAddForm()
+    {
+        var options = new DialogOptions()
+        {
+            FullWidth = true,
+            BackdropClick = false,
+        };
+        return DialogService.ShowAsync<AddPupusaDialog>(null, options);
     }
 }

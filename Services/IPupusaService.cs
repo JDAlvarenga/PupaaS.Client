@@ -6,4 +6,6 @@ public interface IPupusaService
 {
     Task<PagedEnumerable<Pupusa>?> GetPupusasAsync(PupusaParameters pupusaParameters,
         CancellationToken cancellationToken = default);
+    
+    Task<Pupusa?> AddPupusaAsync(NewPupusa newPupusa, CancellationToken cancellationToken = default);
 }
