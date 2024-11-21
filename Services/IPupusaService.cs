@@ -9,4 +9,5 @@ public interface IPupusaService
     
     Task<Pupusa?> AddPupusaAsync(NewPupusa newPupusa, CancellationToken cancellationToken = default);
     Task<Pupusa?> UpdatePupusaAsync(Pupusa pupusa, CancellationToken cancellationToken = default);
+    Task<bool> DeletePupusaAsync(Pupusa pupusa, CancellationToken cancellationToken = default);
 }

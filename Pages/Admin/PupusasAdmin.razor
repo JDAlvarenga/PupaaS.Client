@@ -72,9 +72,19 @@
     </PagerContent>
 </MudDataGrid>
 
+<MudMessageBox @ref="_deleteMessageBox" Title="Warning" CancelText="Cancel">
+    <MessageContent>
+        Deleting can <b><i>not</i></b> be undone!
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete!</MudButton>
+    </YesButton>
+</MudMessageBox>
+
 @code
 {
     private MudDataGrid<Pupusa>? _dataGrid;
+    private MudMessageBox? _deleteMessageBox;
     private PupusaParameters _parameters = new();
     
 
@@ -95,11 +105,6 @@
     {
         _parameters.Search = s;
         return _dataGrid?.ReloadServerData() ?? Task.CompletedTask;
-    }
-
-    private void OnDelete(Pupusa? pupusa)
-    {
-        
     }
     
     // Editing hooks
@@ -125,5 +130,24 @@
             BackdropClick = false,
         };
         return DialogService.ShowAsync<AddPupusaDialog>(null, options);
+    }
+    
+    private async Task OnDelete(Pupusa? pupusa)
+    {
+        if (pupusa is null) return;
+        
+        bool? yesDelete = await _deleteMessageBox!.ShowAsync()!;
+        if (!(yesDelete ?? false))
+            return;
+        
+        var deleted = await PupusaService.DeletePupusaAsync(pupusa);
+        if (!deleted)
+        {
+            Snackbar.Add("Could not delete Pupusa", Severity.Error);
+            return;
+        }
+        
+        Snackbar.Add("Deleted Pupusa", Severity.Success);
+        _dataGrid?.ReloadServerData();
     }
 }

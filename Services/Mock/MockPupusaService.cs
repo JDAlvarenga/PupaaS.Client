@@ -4,7 +4,7 @@ namespace PupaaS.Client.Services.Mock;
 
 public class MockPupusaService: IPupusaService
 {
-    private List<Pupusa> _pupusas = new();
+    private Dictionary<string, Pupusa> _pupusas = new();
     private int _nextId = 1;
     private string NextMockUrl => $"https://picsum.photos/500?random={_nextId++}";
     
@@ -13,9 +13,10 @@ public class MockPupusaService: IPupusaService
     {
         while(_nextId <= 50)
         {
-            _pupusas.Add(new()
+            var url = NextMockUrl;
+            _pupusas.Add(url, new()
             {
-                Url = NextMockUrl,
+                Url = url,
                 Dough = AppParameters.DoughTypes[Random.Shared.Next(AppParameters.DoughTypes.Length)],
                 Ingredients = AppParameters.Ingredients.OrderBy(ing => Random.Shared.Next()).Take(Random.Shared.Next(1, 4)).ToArray()
             });
@@ -26,25 +27,25 @@ public class MockPupusaService: IPupusaService
         var query = _pupusas.AsQueryable();
         if (!string.IsNullOrEmpty(pupusaParameters.Search))
         {
-            query = query.Where(p => 
-                (p.Dough != null && p.Dough.Contains(pupusaParameters.Search)) || 
-                (p.Ingredients != null && p.Ingredients.Any( i => i.Contains(pupusaParameters.Search)))
+            query = query.Where(kvp => 
+                (kvp.Value.Dough != null && kvp.Value.Dough.Contains(pupusaParameters.Search)) || 
+                (kvp.Value.Ingredients != null && kvp.Value.Ingredients.Any( i => i.Contains(pupusaParameters.Search)))
             );
         }
         else
         {
             if (pupusaParameters.Dough is not null)
-                query = query.Where(p => p.Dough == pupusaParameters.Dough);
+                query = query.Where(kvp => kvp.Value.Dough == pupusaParameters.Dough);
             
             if (pupusaParameters.Ingredients is not null && pupusaParameters.Ingredients.Any())
-                query = query.Where(p => p.Ingredients != null && p.Ingredients.Any(i => AppParameters.Ingredients.Contains(i)));
+                query = query.Where(kvp => kvp.Value.Ingredients != null && kvp.Value.Ingredients.Any(i => AppParameters.Ingredients.Contains(i)));
         }
         
         
-        var results = query.ToList();
+        var results = query.Select(kvp => kvp.Value).ToList();
         
         
-        var pagedItems = query
+        var pagedItems = results
             .Skip((pupusaParameters.Page - 1) * pupusaParameters.PageSize)
             .Take(pupusaParameters.PageSize)
             .ToList();
@@ -68,7 +69,7 @@ public class MockPupusaService: IPupusaService
             Ingredients = newPupusa.Ingredients
         };
         await Task.Delay(TimeSpan.FromSeconds(Random.Shared.NextDouble() * 7), cancellationToken);
-        _pupusas.Add(pupusa);
+        _pupusas.Add(pupusa.Url, pupusa);
         
         return pupusa.Clone() as Pupusa;
     }
@@ -76,14 +77,20 @@ public class MockPupusaService: IPupusaService
     public async Task<Pupusa?> UpdatePupusaAsync(Pupusa pupusa, CancellationToken cancellationToken = default)
     {
         await Task.Delay(TimeSpan.FromSeconds(Random.Shared.NextDouble() * 7), cancellationToken);
-        
-        var saved = _pupusas.FindIndex(p => p.Url == pupusa.Url);
-        if (saved == -1)
-            return null;
 
-        _pupusas[saved] = (pupusa.Clone() as Pupusa)!;
+        if (!_pupusas.ContainsKey(pupusa.Url))
+            return null;
+        
+        _pupusas[pupusa.Url] = (pupusa.Clone() as Pupusa)!;
 
         return pupusa;
+    }
+
+    public async Task<bool> DeletePupusaAsync(Pupusa pupusa, CancellationToken cancellationToken = default)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(Random.Shared.NextDouble() * 7), cancellationToken);
+        _pupusas.Remove(pupusa.Url);
+        return true;
     }
     
 }
