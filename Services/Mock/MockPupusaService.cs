@@ -72,5 +72,18 @@ public class MockPupusaService: IPupusaService
         
         return pupusa.Clone() as Pupusa;
     }
+
+    public async Task<Pupusa?> UpdatePupusaAsync(Pupusa pupusa, CancellationToken cancellationToken = default)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(Random.Shared.NextDouble() * 7), cancellationToken);
+        
+        var saved = _pupusas.FindIndex(p => p.Url == pupusa.Url);
+        if (saved == -1)
+            return null;
+
+        _pupusas[saved] = (pupusa.Clone() as Pupusa)!;
+
+        return pupusa;
+    }
     
 }

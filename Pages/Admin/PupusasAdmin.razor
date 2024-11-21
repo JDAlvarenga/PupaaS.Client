@@ -4,8 +4,16 @@
 @using PupaaS.Client.Components
 @inject IPupusaService PupusaService
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
-<MudDataGrid @ref="_dataGrid" T="Pupusa" ServerData="ServerReload" ReadOnly="false" SortMode="SortMode.None" EditMode="DataGridEditMode.Form" StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges" Dense>
+<MudDataGrid @ref="_dataGrid" 
+             T="Pupusa" 
+             ServerData="ServerReload"
+             ReadOnly="false"
+             SortMode="SortMode.None"
+             EditMode="DataGridEditMode.Form"
+             CommittedItemChanges="@CommittedItemChanges" 
+             Dense>
     <ToolBarContent>
         <MudText Typo="Typo.h6">Pupusas</MudText>
         <MudSpacer/>
@@ -95,19 +103,18 @@
     }
     
     // Editing hooks
-    private void StartedEditingItem(Pupusa pupusa)
+    // NOTE: UI is updated regardless of this method's result
+    private async Task CommittedItemChanges(Pupusa pupusa)
     {
-        
-    }
-    
-    private void CanceledEditingItem(Pupusa pupusa)
-    {
-        
-    }
-    
-    private Task CommittedItemChanges(Pupusa pupusa)
-    {
-        return Task.CompletedTask;
+        var result = await PupusaService.UpdatePupusaAsync(pupusa);
+
+        if (result is null)
+        {
+            Snackbar.Add("Failed to update Pupusa", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add("Updated Pupusa", Severity.Success);
     }
 
     private Task DisplayAddForm()
