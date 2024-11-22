@@ -1,7 +1,103 @@
 ﻿@page "/"
+@using PupaaS.Client.Services
 
-<PageTitle>Home</PageTitle>
+<MudStack Row 
+          Wrap="Wrap.Wrap" 
+          Justify="Justify.SpaceEvenly" 
+          AlignItems="AlignItems.Center"
+          StretchItems="StretchItems.Start"
+          Class="pa-10">
+    
+    <MudStack AlignItems="AlignItems.Center">
+        <MudStack Row Justify="Justify.Center" Wrap="Wrap.Wrap">
+            <MudIcon Icon="@Icons.Material.Outlined.PhotoLibrary" Size="Size.Large"/>
+            <MudText Typo="Typo.h1">PupaaS</MudText>
+        </MudStack>
+        <MudText Typo="Typo.h2">Pupusas para llevar (en una API)</MudText>
+    </MudStack>
+    
+    
+    <MudImage Src="https://picsum.photos/400/300"
+              ObjectFit="ObjectFit.Cover"
+              ObjectPosition="ObjectPosition.Center"
+              Elevation="10"
+              Fluid/>
+</MudStack>
 
-<h1>Hello, world!</h1>
+<MudPaper Elevation="0" Class="pa-10 amber lighten-4">
+    <MudStack AlignItems="AlignItems.Center">
+        <MudText Typo="Typo.h3">Fácil de pedir, recién salidas del servidor</MudText>
+        <MudText Typo="Typo.body1">Solo pide una</MudText>
+        <MudPaper Elevation="5" Class="pa-4" MinWidth="75%">
+            <MudLink Href="@_simple" Target="_blank">@_simple</MudLink>
+        </MudPaper>
+        
+        <MudText Typo="Typo.body1">Puedes usar los parametros <span class="red lighten-3">?@PupusaParameters.DoughParamName</span> y <span class="red lighten-3">?@PupusaParameters.IngredientsParamName</span></MudText>
+        <MudPaper Elevation="5" Class="pa-4" MinWidth="75%">
+            <MudLink Href="@_withParams" Target="_blank">@_withParams</MudLink>
+        </MudPaper>
+    </MudStack>
+</MudPaper>
 
-Welcome to your new app.
+<MudStack Row
+          Wrap="Wrap.Wrap"
+          Justify="Justify.SpaceEvenly"
+          AlignItems="AlignItems.Center"
+          StretchItems="StretchItems.Start"
+          Class="pa-10">
+    
+    <MudStack AlignItems="AlignItems.Start">
+        <MudText Typo="Typo.h3">Combo de hasta 10 pupusas</MudText>
+        <MudText Typo="Typo.body1">Obten una lista de pupusa</MudText>
+        <MudPaper Elevation="5" Class="pa-4" MinWidth="75%">
+            <MudLink Href="@_list" Target="_blank">@_list</MudLink>
+        </MudPaper>
+    
+        <MudStack AlignItems="AlignItems.Start" Spacing="0" Style="width: 75%">
+            
+            <MudText Typo="Typo.body1">Por defecto obtendras 5 pupusas.</MudText>
+            <MudText Typo="Typo.body1">Para solicitar otra página puedes usar el parametro <span class="amber lighten-3">?@QueryParameters.PageParamName</span>.</MudText>
+            <MudText Typo="Typo.body1">También puedes usar el parametro <span class="amber lighten-3">?@QueryParameters.SizeParamName</span> para cambiar la cantidad de pupusas hasta 10.</MudText>
+        </MudStack>
+        <MudPaper Elevation="5" Class="pa-4" MinWidth="75%">
+            <MudLink Href="@_listParams" Target="_blank">@_listParams</MudLink>
+        </MudPaper>
+        
+    </MudStack>
+
+    <MudImage Src="https://picsum.photos/400/300?random=1"
+              ObjectFit="ObjectFit.Cover"
+              ObjectPosition="ObjectPosition.Center"
+              Elevation="10"
+              Fluid/>
+
+</MudStack>
+
+@code
+{
+    private string? _host;
+    private string? Host
+    {
+        get => _host;
+        set
+        {
+            _host = value;
+            _simple = $"{_host}/pupusa";
+            _withParams = $"{_host}/pupusa?{PupusaParameters.IngredientsParamName}=revuelta&{PupusaParameters.DoughParamName}=arroz";
+            _list = $"{_host}/api/pupusa?{PupusaParameters.DoughParamName}=yuca";
+            _listParams = $"{_host}/api/pupusa?{QueryParameters.PageParamName}=2&{QueryParameters.SizeParamName}=10";
+        }
+    }
+    private string? _simple;
+    private string? _withParams;
+    private string? _list;
+    private string? _listParams;
+
+    protected override Task OnInitializedAsync()
+    {
+        // TODO: Obtener desde configuracion
+        Host = "http://localhost:5191";
+        return base.OnInitializedAsync();
+    }
+
+}

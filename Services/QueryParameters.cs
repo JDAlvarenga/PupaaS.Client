@@ -2,6 +2,9 @@ namespace PupaaS.Client.Services;
 
 public class QueryParameters
 {
+    public const string PageParamName = "page";
+    public const string SizeParamName = "limit";
+    
     public static int DefaultPageSize = 10;
     public static int DefaultPageNumber = 1;
     
