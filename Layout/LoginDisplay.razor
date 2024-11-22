@@ -1,0 +1,30 @@
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
+
+<AuthorizeView>
+    <Authorized>
+        <MudTooltip Text="@context.User.Identity?.Name">
+            <MudAvatar>
+                <MudImage Src="@context.User.Claims.FirstOrDefault(claim => claim.Type == "picture")?.Value"/>
+            </MudAvatar>
+        </MudTooltip>
+        <MudIconButton
+            Icon="@Icons.Material.Outlined.Logout"
+            Color="Color.Secondary"
+            OnClick="BeginLogOut"
+            Class="ml-2"/>
+    </Authorized>
+    <NotAuthorized>
+        <MudLink Href="authentication/login">
+            <MudIconButton Icon="@Icons.Custom.Brands.Google"
+                           Color="Color.Secondary"/>
+        </MudLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    public void BeginLogOut()
+    {
+        Navigation.NavigateToLogout("authentication/logout");
+    }
+}
