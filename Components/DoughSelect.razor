@@ -2,8 +2,8 @@
 
 <MudSelect @bind-Value:get="Dough" 
            @bind-Value:set="DoughChanged" 
-           Label="Dough type" 
-           HelperText="Select the dough type from the list">
+           Label="Tipo de masa" 
+           HelperText="Seleccione el tipo de masa de la lista">
     @foreach (var dough in AppParameters.DoughTypes)
     {
         <MudSelectItem Value="@dough">@dough</MudSelectItem>

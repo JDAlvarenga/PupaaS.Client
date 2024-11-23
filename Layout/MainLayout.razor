@@ -2,22 +2,28 @@
 
 <PageTitle>PupaaS</PageTitle>
 
-<MudThemeProvider Theme="CustomTheme"/>
+<MudThemeProvider Theme="_customTheme"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
 <MudLayout>
     <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
-        PupaaS
+        <MudNavLink Href="/" Match="NavLinkMatch.All">PupaaS</MudNavLink>
+        <AuthorizeView>
+            <Authorized>
+
+                <MudNavLink Href="/admin" Match="NavLinkMatch.Prefix">Admin</MudNavLink>
+                @* <MudNavLink Href="/user" Match="NavLinkMatch.Prefix">Test auth</MudNavLink> *@
+            </Authorized>
+        </AuthorizeView>
         <MudSpacer/>
         <LoginDisplay/>
     </MudAppBar>
     
-    <MudDrawer @bind-Open="@_drawerOpen">
-        <NavMenu/>
-    </MudDrawer>
+    @* <MudDrawer @bind-Open="@_drawerOpen"> *@
+    @*     <NavMenu/> *@
+    @* </MudDrawer> *@
     
     <MudMainContent>
         @Body
@@ -25,14 +31,14 @@
 </MudLayout>
 
 @code {
-    private bool _drawerOpen = true;
+    // private bool _drawerOpen = true;
+    //
+    // private void DrawerToggle()
+    // {
+    //     _drawerOpen = !_drawerOpen;
+    // }
 
-    private void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
-
-    private MudTheme CustomTheme = new MudTheme()
+    private readonly MudTheme _customTheme = new MudTheme()
     {
         Typography = new Typography()
         {

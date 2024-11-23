@@ -2,8 +2,8 @@
 
 <MudSelect @bind-SelectedValues:get="Ingredients" 
            @bind-SelectedValues:set="IngredientsChanged" 
-           Label="Ingredients" 
-           HelperText="Select the ingredients from the list" 
+           Label="Ingredientes" 
+           HelperText="Seleccione los ingredientes de la lista" 
            MultiSelection="true">
     @foreach (var ingredient in AppParameters.Ingredients)
     {

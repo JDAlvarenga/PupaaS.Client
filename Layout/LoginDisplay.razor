@@ -8,16 +8,18 @@
                 <MudImage Src="@context.User.Claims.FirstOrDefault(claim => claim.Type == "picture")?.Value"/>
             </MudAvatar>
         </MudTooltip>
+        <!--suppress CssUnresolvedCustomProperty -->
         <MudIconButton
             Icon="@Icons.Material.Outlined.Logout"
-            Color="Color.Secondary"
+            Style="color:var(--mud-palette-primary-text)"
             OnClick="BeginLogOut"
             Class="ml-2"/>
     </Authorized>
     <NotAuthorized>
         <MudLink Href="authentication/login">
+            <!--suppress CssUnresolvedCustomProperty -->
             <MudIconButton Icon="@Icons.Custom.Brands.Google"
-                           Color="Color.Secondary"/>
+                           Style="color:var(--mud-palette-primary-text)"/>
         </MudLink>
     </NotAuthorized>
 </AuthorizeView>

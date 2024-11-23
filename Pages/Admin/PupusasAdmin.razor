@@ -1,4 +1,6 @@
 @page "/admin"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
 @using PupaaS.Client.Models
 @using PupaaS.Client.Services
 @using PupaaS.Client.Components
@@ -30,17 +32,12 @@
                 <MudImage Src="@context.Item.Url" Elevation="25" Width="400" Height="400" ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Center" Fluid Class="rounded-lg  mx-sm-4 mb-8"/>
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="pupusa => pupusa.Dough" Title="Dough">
+        <PropertyColumn Property="pupusa => pupusa.Dough" Title="Masa">
             <EditTemplate>
-                <MudSelect @bind-Value="context.Item.Dough" Label="Dough type" HelperText="Select the dough type from the list">
-                    @foreach (var dough in AppParameters.DoughTypes)
-                    {
-                        <MudSelectItem Value="@dough">@dough</MudSelectItem>
-                    }
-                </MudSelect>
+                <DoughSelect @bind-Dough="context.Item.Dough"/>
             </EditTemplate>
         </PropertyColumn>
-        <TemplateColumn Title="Ingredients">
+        <TemplateColumn Title="Ingredientes">
             <CellTemplate>
                 @foreach (var ingredient in context.Item?.Ingredients ?? [])
                 {
@@ -48,12 +45,7 @@
                 }
             </CellTemplate>
             <EditTemplate>
-                <MudSelect @bind-SelectedValues="context.Item.Ingredients" Label="Dough type" HelperText="Select the ingredients from the list" MultiSelection="true">
-                    @foreach (var ingredient in AppParameters.Ingredients)
-                    {
-                        <MudSelectItem Value="@ingredient">@ingredient</MudSelectItem>
-                    }
-                </MudSelect>
+                <IngredientSelect @bind-Ingredients="context.Item.Ingredients" />
             </EditTemplate>
         </TemplateColumn>
 
@@ -72,12 +64,12 @@
     </PagerContent>
 </MudDataGrid>
 
-<MudMessageBox @ref="_deleteMessageBox" Title="Warning" CancelText="Cancel">
+<MudMessageBox @ref="_deleteMessageBox" Title="Eliminar pupusa" CancelText="Cancelar">
     <MessageContent>
-        Deleting can <b><i>not</i></b> be undone!
+        ¿Seguro que desea eliminar?
     </MessageContent>
     <YesButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete!</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Eliminar</MudButton>
     </YesButton>
 </MudMessageBox>
 
@@ -115,11 +107,11 @@
 
         if (result is null)
         {
-            Snackbar.Add("Failed to update Pupusa", Severity.Error);
+            Snackbar.Add("No fue posible guardar los cambios", Severity.Error);
             return;
         }
 
-        Snackbar.Add("Updated Pupusa", Severity.Success);
+        Snackbar.Add("Pupusa modificada", Severity.Success);
     }
 
     private Task DisplayAddForm()
@@ -143,11 +135,11 @@
         var deleted = await PupusaService.DeletePupusaAsync(pupusa);
         if (!deleted)
         {
-            Snackbar.Add("Could not delete Pupusa", Severity.Error);
+            Snackbar.Add("No fue posible eliminar", Severity.Error);
             return;
         }
         
-        Snackbar.Add("Deleted Pupusa", Severity.Success);
+        Snackbar.Add("Pupusa eliminada", Severity.Success);
         _dataGrid?.ReloadServerData();
     }
 }

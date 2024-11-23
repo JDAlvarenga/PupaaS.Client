@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using PupaaS.Client.Services
+@inject NavigationManager NavigationManager
 
 <MudStack Row 
           Wrap="Wrap.Wrap" 
@@ -41,6 +42,7 @@
 
 <MudStack Row
           Wrap="Wrap.Wrap"
+          Spacing="16"
           Justify="Justify.SpaceEvenly"
           AlignItems="AlignItems.Center"
           StretchItems="StretchItems.Start"
@@ -48,18 +50,18 @@
     
     <MudStack AlignItems="AlignItems.Start">
         <MudText Typo="Typo.h3">Combo de hasta 10 pupusas</MudText>
-        <MudText Typo="Typo.body1">Obten una lista de pupusa</MudText>
-        <MudPaper Elevation="5" Class="pa-4" MinWidth="75%">
+        <MudText Typo="Typo.body1">Obtén una lista de pupusa</MudText>
+        <MudPaper Elevation="5" Class="pa-4" MinWidth="100%">
             <MudLink Href="@_list" Target="_blank">@_list</MudLink>
         </MudPaper>
     
         <MudStack AlignItems="AlignItems.Start" Spacing="0" Style="width: 75%">
             
-            <MudText Typo="Typo.body1">Por defecto obtendras 5 pupusas.</MudText>
-            <MudText Typo="Typo.body1">Para solicitar otra página puedes usar el parametro <span class="amber lighten-3">?@QueryParameters.PageParamName</span>.</MudText>
-            <MudText Typo="Typo.body1">También puedes usar el parametro <span class="amber lighten-3">?@QueryParameters.SizeParamName</span> para cambiar la cantidad de pupusas hasta 10.</MudText>
+            <MudText Typo="Typo.body1">Por defecto obtendrás 5 pupusas.</MudText>
+            <MudText Typo="Typo.body1">Para solicitar otra página puedes usar el parámetro <span class="amber lighten-3">?@QueryParameters.PageParamName</span>.</MudText>
+            <MudText Typo="Typo.body1">También puedes usar el parámetro <span class="amber lighten-3">?@QueryParameters.SizeParamName</span> para cambiar la cantidad de pupusas hasta 10.</MudText>
         </MudStack>
-        <MudPaper Elevation="5" Class="pa-4" MinWidth="75%">
+        <MudPaper Elevation="5" Class="pa-4" MinWidth="100%">
             <MudLink Href="@_listParams" Target="_blank">@_listParams</MudLink>
         </MudPaper>
         
@@ -82,10 +84,10 @@
         set
         {
             _host = value;
-            _simple = $"{_host}/pupusa";
-            _withParams = $"{_host}/pupusa?{PupusaParameters.IngredientsParamName}=revuelta&{PupusaParameters.DoughParamName}=arroz";
-            _list = $"{_host}/api/pupusa?{PupusaParameters.DoughParamName}=yuca";
-            _listParams = $"{_host}/api/pupusa?{QueryParameters.PageParamName}=2&{QueryParameters.SizeParamName}=10";
+            _simple = $"{_host}pupusa";
+            _withParams = $"{_host}pupusa?{PupusaParameters.IngredientsParamName}=revuelta&{PupusaParameters.DoughParamName}=arroz";
+            _list = $"{_host}api/pupusa?{PupusaParameters.DoughParamName}=yuca";
+            _listParams = $"{_host}api/pupusa?{QueryParameters.PageParamName}=2&{QueryParameters.SizeParamName}=10";
         }
     }
     private string? _simple;
@@ -95,8 +97,7 @@
 
     protected override Task OnInitializedAsync()
     {
-        // TODO: Obtener desde configuracion
-        Host = "http://localhost:5191";
+        Host = NavigationManager.BaseUri;
         return base.OnInitializedAsync();
     }
 
