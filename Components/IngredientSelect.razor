@@ -2,8 +2,8 @@
 
 <MudSelect @bind-SelectedValues:get="Ingredients" 
            @bind-SelectedValues:set="IngredientsChanged" 
-           Label="Ingredientes" 
-           HelperText="Seleccione los ingredientes de la lista" 
+           Label="@(Simple? null : "Ingredientes")"
+           HelperText="@(Simple ? null : "Seleccione los ingredientes de la lista")"
            MultiSelection="true">
     @foreach (var ingredient in AppParameters.Ingredients)
     {
@@ -15,4 +15,5 @@
 {
     [Parameter] public IEnumerable<string>? Ingredients { get; set; }
     [Parameter] public EventCallback<IEnumerable<string>?> IngredientsChanged { get; set; }
+    [Parameter] public bool Simple { get; set; }
 }

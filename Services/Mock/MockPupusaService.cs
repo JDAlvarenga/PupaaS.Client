@@ -32,14 +32,14 @@ public class MockPupusaService: IPupusaService
                 (kvp.Value.Ingredients != null && kvp.Value.Ingredients.Any( i => i.Contains(pupusaParameters.Search)))
             );
         }
-        else
-        {
-            if (pupusaParameters.Dough is not null)
-                query = query.Where(kvp => kvp.Value.Dough == pupusaParameters.Dough);
-            
-            if (pupusaParameters.Ingredients is not null && pupusaParameters.Ingredients.Any())
-                query = query.Where(kvp => kvp.Value.Ingredients != null && kvp.Value.Ingredients.Any(i => AppParameters.Ingredients.Contains(i)));
-        }
+        
+        
+        if (pupusaParameters.Dough is not null)
+            query = query.Where(kvp => kvp.Value.Dough == pupusaParameters.Dough);
+        
+        if (pupusaParameters.Ingredients is not null && pupusaParameters.Ingredients.Any())
+            query = query.Where(kvp => kvp.Value.Ingredients != null && kvp.Value.Ingredients.Any(i => pupusaParameters.Ingredients.Contains(i)));
+        
         
         
         var results = query.Select(kvp => kvp.Value).ToList();

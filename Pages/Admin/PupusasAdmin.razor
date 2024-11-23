@@ -1,5 +1,6 @@
 @page "/admin"
 @attribute [Authorize]
+@using System.ComponentModel.Design.Serialization
 @using Microsoft.AspNetCore.Authorization
 @using PupaaS.Client.Models
 @using PupaaS.Client.Services
@@ -13,6 +14,8 @@
              ServerData="ServerReload"
              ReadOnly="false"
              SortMode="SortMode.None"
+             Filterable
+             FilterMode="DataGridFilterMode.ColumnFilterRow"
              EditMode="DataGridEditMode.Form"
              CommittedItemChanges="@CommittedItemChanges" 
              Dense>
@@ -27,7 +30,7 @@
     </ToolBarContent>
     
     <Columns>
-        <PropertyColumn Property="pupusa => pupusa.Url" Title="Url" Editable="false">
+        <PropertyColumn Property="pupusa => pupusa.Url" Title="Url" Editable="false" Filterable="false">
             <EditTemplate>
                 <MudImage Src="@context.Item.Url" Elevation="25" Width="400" Height="400" ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Center" Fluid Class="rounded-lg  mx-sm-4 mb-8"/>
             </EditTemplate>
@@ -36,8 +39,15 @@
             <EditTemplate>
                 <DoughSelect @bind-Dough="context.Item.Dough"/>
             </EditTemplate>
+            <FilterTemplate>
+                <DoughSelect 
+                    @bind-Dough:get="_parameters.Dough" 
+                    @bind-Dough:set="FilteringDough" 
+                    Simple/>
+            </FilterTemplate>
         </PropertyColumn>
-        <TemplateColumn Title="Ingredientes">
+        
+        <TemplateColumn Title="Ingredientes" Filterable="true">
             <CellTemplate>
                 @foreach (var ingredient in context.Item?.Ingredients ?? [])
                 {
@@ -47,6 +57,12 @@
             <EditTemplate>
                 <IngredientSelect @bind-Ingredients="context.Item.Ingredients" />
             </EditTemplate>
+            <FilterTemplate>
+                <IngredientSelect 
+                    @bind-Ingredients:get="_parameters.Ingredients" 
+                    @bind-Ingredients:set="FilteringIngredients" 
+                    Simple/>
+            </FilterTemplate>
         </TemplateColumn>
 
         <TemplateColumn>
@@ -141,5 +157,18 @@
         
         Snackbar.Add("Pupusa eliminada", Severity.Success);
         _dataGrid?.ReloadServerData();
+    }
+
+    private void FilteringDough(string? dough)
+    {
+        _parameters.Dough = dough;
+        _dataGrid?.ReloadServerData();
+        
+    }
+    private void FilteringIngredients(IEnumerable<string>? ingredients)
+    {
+        _parameters.Ingredients = ingredients;
+        _dataGrid?.ReloadServerData();
+        
     }
 }
